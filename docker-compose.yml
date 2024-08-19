@@ -1,0 +1,22 @@
+﻿version: '3.8'
+
+services:
+  api:
+    image: projectmanager-api-user
+    build:
+      context: .
+      dockerfile: ProjectManager.Api.User/Dockerfile
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=db;Database=ProjectManagerUsers;User=sa;Password=YourStrongPassword123;TrustServerCertificate=True;
+
+  db:
+    image: mcr.microsoft.com/mssql/server
+    environment:
+      SA_PASSWORD: "YourStrongPassword123"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
