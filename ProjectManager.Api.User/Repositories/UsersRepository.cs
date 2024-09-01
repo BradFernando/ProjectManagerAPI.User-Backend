@@ -15,6 +15,7 @@ namespace ProjectManager.Api.User.Repositories
         private readonly CloudinaryService _cloudinaryService;
 
 
+
         //Inyectamos el contexto de la base de datos y Cloudinary
         public UsersRepository(UserDbContext context, CloudinaryService cloudinaryService)
         {
@@ -33,6 +34,19 @@ namespace ProjectManager.Api.User.Repositories
             catch (Exception ex)
             {
                 throw new Exception("Error al leer todos los usuarios", ex);
+            }
+        }
+        
+        //Método para leer un usuario por su userName
+        public async Task<Users?> ReadByUserName(string userName)
+        {
+            try
+            {
+                return await _context.Users.SingleOrDefaultAsync(u => u.userName == userName);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al leer el usuario con userName {userName}", ex);
             }
         }
 
@@ -163,25 +177,23 @@ namespace ProjectManager.Api.User.Repositories
         //Método para iniciar sesión
         public async Task<string> Login(string userName, string password)
         {
-            try
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.userName == userName);
+            if (user == null)
             {
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.userName == userName);
-                if (user == null)
-                {
-                    return "El nombre de usuario no existe";
-                }
-
-                if (!PasswordProtected.VerifyPassword(password, user.password))
-                {
-                    return "Contraseña incorrecta";
-                }
-
-                return "Inicio de sesión exitoso";
+                return "El nombre de usuario no existe";
             }
-            catch (Exception ex)
+
+            if (!PasswordProtected.VerifyPassword(password, user.password))
             {
-                throw new Exception("Error al iniciar sesión", ex);
+                return "Contraseña incorrecta";
             }
+
+            if (user.status == 0)
+            {
+                return "Su correo electrónico no ha sido activado";
+            }
+
+            return "Inicio de sesión exitoso";
         }
         
         //Método para enviar un mensaje a un usuario por correo electrónico
