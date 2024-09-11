@@ -1,22 +1,23 @@
-﻿version: '3.8'
-
-services:
+﻿services:
   api:
-    image: projectmanager-api-user
     build:
       context: .
       dockerfile: ProjectManager.Api.User/Dockerfile
+    image: projectmanager-api-user
     ports:
-      - "8080:8080"
-      - "8081:8081"
+      - "5078:80"   # Mapea el puerto 80 del contenedor al puerto 5078 del host
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=db;Database=ProjectManagerUsers;User=sa;Password=YourStrongPassword123;TrustServerCertificate=True;
+      - ConnectionStrings__DefaultConnection=Server=server-projects-pma.database.windows.net;Database=ProjectManagerUsers;User Id=bradley;Password=2001BradFer*7;TrustServerCertificate=True;
+      - JwtSettings__SecretKey=secure-key-projectmanagersecretkey123
+      - JwtSettings__Issuer=ProjectManagerAPI
+      - JwtSettings__Audience=*
+      - Cloudinary__CloudName=ddafrj6z7
+      - Cloudinary__ApiKey=986386623115898
+      - Cloudinary__ApiSecret=lgXYQNlYhTTIXUesGiF_AwAEehg
+    networks:
+      - mynetwork
 
-  db:
-    image: mcr.microsoft.com/mssql/server
-    environment:
-      SA_PASSWORD: "YourStrongPassword123"
-      ACCEPT_EULA: "Y"
-    ports:
-      - "1433:1433"
+networks:
+  mynetwork:
+    driver: bridge

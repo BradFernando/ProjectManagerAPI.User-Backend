@@ -26,9 +26,28 @@ namespace ProjectManager.Api.User.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<Users>> CreateUser([FromBody] Users user)
         {
-            var createdUser = await _usersRepository.Create(user);
-            return CreatedAtAction(nameof(GetUserById), new { createdUser.id }, createdUser);
+            try
+            {
+                var createdUser = await _usersRepository.Create(user);
+                return CreatedAtAction(nameof(GetUserById), new { createdUser.id }, createdUser);
+            }
+            catch (Exception ex)
+            {
+                // Si el error es por correo o nombre de usuario duplicado, devolvemos un BadRequest con un mensaje adecuado
+                if (ex.Message.Contains("El correo electrónico ya ha sido registrado"))
+                {
+                    return BadRequest(new { message = "Este correo ya ha sido registrado. Por favor revisa tu bandeja de entrada para confirmar tu cuenta." });
+                }
+                else if (ex.Message.Contains("El nombre de usuario ya ha sido registrado"))
+                {
+                    return BadRequest(new { message = "Este nombre de usuario ya está en uso. Por favor elige otro." });
+                }
+
+                // Si es otro tipo de error, devolver un error de servidor
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Error al registrar el usuario: {ex.Message}" });
+            }
         }
+
 
         //Método para loguear un usuario
         [HttpPost("login")]
@@ -170,13 +189,13 @@ namespace ProjectManager.Api.User.Controllers
             return Ok(updatedUser);
         }
 
-        //Método para subir una imagen a Cloudinary
+        //Método para subir una imagen a Imgbb
         [HttpPost("uploadimage")]
         public async Task<ActionResult<string>> UploadImage(IFormFile file)
         {
             try
             {
-                var imageUrl = await _usersRepository.UploadImageToCloudinary(file);
+                var imageUrl = await _usersRepository.UploadImageToImgbb(file); // Cambiado a Imgbb
                 return Ok(new { ImageUrl = imageUrl });
             }
             catch (Exception ex)
@@ -184,6 +203,7 @@ namespace ProjectManager.Api.User.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Error al cargar la imagen: {ex.Message}");
             }
         }
+
     
         
         //Método para verificar el estado de confirmación de un usuario

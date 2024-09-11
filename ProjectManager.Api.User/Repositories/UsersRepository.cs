@@ -10,17 +10,17 @@ namespace ProjectManager.Api.User.Repositories
 {
     public class UsersRepository : IActions<Users>
     {
-        //Llamamos al contexto de la base de datos y a Cloudinary
+        //Llamamos al contexto de la base de datos y a ImgBBservice
         private readonly UserDbContext _context;
-        private readonly CloudinaryService _cloudinaryService;
+        private readonly ImgbbService _imgbbService;
 
 
 
-        //Inyectamos el contexto de la base de datos y Cloudinary
-        public UsersRepository(UserDbContext context, CloudinaryService cloudinaryService)
+        //Inyectamos el contexto de la base de datos y ImgBBservice
+        public UsersRepository(UserDbContext context, ImgbbService imgbbService)
         {
             _context = context;
-            _cloudinaryService = cloudinaryService;
+            _imgbbService = imgbbService;
 
         }
 
@@ -51,10 +51,25 @@ namespace ProjectManager.Api.User.Repositories
         }
 
         //Método para crear un usuario
+        //Método para crear un usuario
         public async Task<Users> Create(Users user)
         {
             try
             {
+                // Verifica si el correo ya ha sido registrado
+                var existingUserByEmail = await _context.Users.SingleOrDefaultAsync(u => u.email == user.email);
+                if (existingUserByEmail != null)
+                {
+                    throw new Exception("El correo electrónico ya ha sido registrado. Por favor verifica tu correo.");
+                }
+
+                // Verifica si el nombre de usuario ya ha sido registrado
+                var existingUserByUserName = await _context.Users.SingleOrDefaultAsync(u => u.userName == user.userName);
+                if (existingUserByUserName != null)
+                {
+                    throw new Exception("El nombre de usuario ya ha sido registrado. Por favor elige otro.");
+                }
+
                 if (user.type < 0 || user.type > 1)
                 {
                     throw new ArgumentException("El campo 'type' debe ser 0 o 1");
@@ -65,17 +80,20 @@ namespace ProjectManager.Api.User.Repositories
                     throw new ArgumentException("El campo 'status' debe ser 0 o 1");
                 }
 
+                // Hashear la contraseña antes de guardarla
                 user.password = PasswordProtected.HashPassword(user.password);
 
+                // Agregar el nuevo usuario a la base de datos
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
                 return user;
             }
             catch (Exception ex)
             {
-                throw new Exception("Error al crear el usuario", ex);
+                throw new Exception("Error al crear el usuario: " + ex.Message, ex);
             }
         }
+
 
         //Método para leer un usuario por su id
         public async Task<Users?> ReadById(int id)
@@ -276,8 +294,8 @@ namespace ProjectManager.Api.User.Repositories
             }
         }
         
-        // Método para cargar una imagen a Cloudinary
-        public async Task<string> UploadImageToCloudinary(IFormFile file)
+        // Método para cargar una imagen a Imgbb
+        public async Task<string> UploadImageToImgbb(IFormFile file)
         {
             try
             {
@@ -286,12 +304,12 @@ namespace ProjectManager.Api.User.Repositories
                     throw new ArgumentException("No file provided");
                 }
 
-                var imageUrl = await _cloudinaryService.UploadImageAsync(file);
+                var imageUrl = await _imgbbService.UploadImageAsync(file);
                 return imageUrl;
             }
             catch (Exception ex)
             {
-                throw new Exception("Error al cargar la imagen a Cloudinary", ex);
+                throw new Exception("Error al cargar la imagen a Imgbb", ex);
             }
         }
         

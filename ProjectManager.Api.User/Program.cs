@@ -10,10 +10,10 @@ using ProjectManager.Api.User.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuracion de la cadena de conexion
+// Configuración de la cadena de conexión
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-// Configuracion del contexto de la base de datos
+// Configuración del contexto de la base de datos
 builder.Services.AddDbContext<UserDbContext>(options =>
     options.UseSqlServer(connectionString));
 
@@ -29,8 +29,8 @@ builder.Services.AddScoped<JwtUtils>();
 // Add services to the container.
 builder.Services.AddControllers();
 
-// Registrar el servicio de Cloudinary
-builder.Services.AddScoped<CloudinaryService>();
+// Registrar el servicio de Imgbb en lugar de Cloudinary
+builder.Services.AddHttpClient<ImgbbService>(); // HttpClient es necesario para ImgbbService
 
 // Configuración de Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -71,6 +71,20 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
+// Configurar Kestrel para deshabilitar HTTPS en desarrollo
+if (builder.Environment.IsDevelopment())
+{
+    builder.WebHost.ConfigureKestrel(options =>
+    {
+        options.ListenAnyIP(5078); // Configuración para HTTP en puerto 5078
+        options.ListenAnyIP(7295, listenOptions => // Configuración para HTTPS en puerto 7295
+        {
+            listenOptions.UseHttps();
+        });
+    });
+}
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -80,7 +94,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// Deshabilitar redirección HTTPS
+// app.UseHttpsRedirection(); // Comentar o eliminar esta línea
 
 app.UseCors("AllowAllOrigins");
 
