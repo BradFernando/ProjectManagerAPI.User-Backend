@@ -151,26 +151,18 @@ namespace ProjectManager.Api.User.Repositories
         //Método para actualizar la contraseña de un usuario por su email
         public async Task<Users> UpdatePasswordByEmail(string emailAddress, string newPassword)
         {
-            try
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.email == emailAddress);
+            if (user == null)
             {
-                var user = await _context.Users.SingleOrDefaultAsync(u => u.email == emailAddress);
-                if (user == null)
-                {
-                    throw new Exception("El correo electrónico no existe");
-                }
+                return null;  // Devolver null si el usuario no existe
+            }
 
-                user.password = PasswordProtected.HashPassword(newPassword);
-                _context.Users.Update(user);
-                await _context.SaveChangesAsync();
-                return user;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error al actualizar la contraseña del usuario con email {emailAddress}", ex);
-            }
+            user.password = PasswordProtected.HashPassword(newPassword);
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+            return user;
         }
         
-
         //Método para eliminar un usuario
         public async Task<Users> Delete(int id)
         {

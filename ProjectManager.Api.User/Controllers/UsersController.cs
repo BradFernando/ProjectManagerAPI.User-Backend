@@ -131,11 +131,17 @@ namespace ProjectManager.Api.User.Controllers
 
         //Método para actualizar la contraseña de un usuario por su email
         [HttpPut("updatepassword")]
-        public async Task<ActionResult<Users>> UpdatePasswordByEmail([FromQuery] string email,
-            [FromBody] string newPassword)
+        public async Task<ActionResult<Users>> UpdatePasswordByEmail([FromQuery] string email, [FromBody] string newPassword)
         {
             var updatedUser = await _usersRepository.UpdatePasswordByEmail(email, newPassword);
-            return Ok(updatedUser);
+
+            if (updatedUser == null)
+            {
+                // Devolver 404 si el correo no existe
+                return NotFound(new { message = $"El usuario con el correo {email} no existe." });
+            }
+
+            return Ok(updatedUser);  // Devolver el usuario actualizado
         }
 
 
