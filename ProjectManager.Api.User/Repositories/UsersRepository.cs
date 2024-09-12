@@ -51,7 +51,6 @@ namespace ProjectManager.Api.User.Repositories
         }
 
         //Método para crear un usuario
-        //Método para crear un usuario
         public async Task<Users> Create(Users user)
         {
             try
@@ -126,6 +125,7 @@ namespace ProjectManager.Api.User.Repositories
         {
             try
             {
+                // Verifica los valores permitidos para los campos 'type' y 'status'
                 if (user.type < 0 || user.type > 1)
                 {
                     throw new ArgumentException("El campo 'type' debe ser 0 o 1");
@@ -136,17 +136,36 @@ namespace ProjectManager.Api.User.Repositories
                     throw new ArgumentException("El campo 'status' debe ser 0 o 1");
                 }
 
-                user.password = PasswordProtected.HashPassword(user.password);
+                // Obtener el usuario existente desde la base de datos
+                var existingUser = await _context.Users.FindAsync(user.id);
+                if (existingUser == null)
+                {
+                    throw new Exception("Usuario no encontrado");
+                }
 
-                _context.Users.Update(user);
+                // Actualizar solo los campos relevantes
+                existingUser.firstName = user.firstName;
+                existingUser.lastName = user.lastName;
+                existingUser.userName = user.userName;
+                existingUser.avatar = user.avatar;
+                existingUser.email = user.email;
+
+                // Solo actualizar la contraseña si ha cambiado (es decir, si el campo `password` no está encriptado)
+                if (!string.IsNullOrEmpty(user.password) && user.password != existingUser.password)
+                {
+                    existingUser.password = PasswordProtected.HashPassword(user.password);
+                }
+
+                _context.Users.Update(existingUser);
                 await _context.SaveChangesAsync();
-                return user;
+                return existingUser;
             }
             catch (Exception ex)
             {
                 throw new Exception("Error al actualizar el usuario", ex);
             }
         }
+
         
         //Método para actualizar la contraseña de un usuario por su email
         public async Task<Users> UpdatePasswordByEmail(string emailAddress, string newPassword)
@@ -193,7 +212,8 @@ namespace ProjectManager.Api.User.Repositories
                 return "El nombre de usuario no existe";
             }
 
-            if (!PasswordProtected.VerifyPassword(password, user.password))
+            // Verifica si la contraseña ingresada coincide con la encriptada en la base de datos
+            if (!PasswordProtected.VerifyPassword(password, user.password))  // Aquí compara la contraseña sin encriptar con la versión encriptada
             {
                 return "Contraseña incorrecta";
             }
@@ -205,6 +225,7 @@ namespace ProjectManager.Api.User.Repositories
 
             return "Inicio de sesión exitoso";
         }
+
         
         //Método para enviar un mensaje a un usuario por correo electrónico
         public async Task<string> SendMessageToUser(string email, EmailSend emailConfig)

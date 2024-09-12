@@ -49,20 +49,34 @@ namespace ProjectManager.Api.User.Controllers
         }
 
 
-        //Método para loguear un usuario
+//Método para loguear un usuario
         [HttpPost("login")]
         public async Task<ActionResult<string>> LoginUser([FromBody] LoginRequest loginRequest)
         {
-            var result = await _usersRepository.Login(loginRequest.UserName, loginRequest.Password);
-            if (result == "El nombre de usuario no existe" || result == "Contraseña incorrecta" ||
-                result == "Su correo electrónico no ha sido activado")
+            // Buscar el usuario por el nombre de usuario
+            var user = await _usersRepository.ReadByUserName(loginRequest.UserName);
+            if (user == null)
             {
-                return BadRequest(result);
+                return BadRequest("El nombre de usuario no existe");
             }
 
-            var token = _jwtUtils.GenerateToken(loginRequest.UserName); // Genera el token JWT
+            // Verificar la contraseña ingresada (sin encriptar) contra la contraseña encriptada almacenada en la base de datos
+            if (!PasswordProtected.VerifyPassword(loginRequest.Password, user.password))
+            {
+                return BadRequest("Contraseña incorrecta");
+            }
+
+            // Si la contraseña es correcta, verificar si el correo está activado
+            if (user.status == 0)
+            {
+                return BadRequest("Su correo electrónico no ha sido activado");
+            }
+
+            // Generar el token JWT y devolverlo en la respuesta
+            var token = _jwtUtils.GenerateToken(user.userName);
             return Ok(new { Token = token });
         }
+
 
         //Método para obtener todos los usuarios
         [HttpGet]
