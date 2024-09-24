@@ -30,7 +30,7 @@ builder.Services.AddScoped<JwtUtils>();
 builder.Services.AddControllers();
 
 // Registrar el servicio de Imgbb en lugar de Cloudinary
-builder.Services.AddHttpClient<ImgbbService>(); // HttpClient es necesario para ImgbbService
+builder.Services.AddHttpClient<ImgurService>();  // HttpClient es necesario para ImgurService
 
 // Configuración de Swagger
 builder.Services.AddEndpointsApiExplorer();

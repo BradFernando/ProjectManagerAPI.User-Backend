@@ -77,6 +77,22 @@
           }
         }
       },
+      "Imgur.API/5.0.0": {
+        "type": "package",
+        "dependencies": {
+          "System.Text.Json": "4.7.2"
+        },
+        "compile": {
+          "lib/netstandard2.0/Imgur.API.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/Imgur.API.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.AspNetCore.Authentication.JwtBearer/8.0.8": {
         "type": "package",
         "dependencies": {
@@ -2434,6 +2450,21 @@
         "lib/netstandard2.0/Humanizer.dll",
         "lib/netstandard2.0/Humanizer.xml",
         "logo.png"
+      ]
+    },
+    "Imgur.API/5.0.0": {
+      "sha512": "Iso2lol4tCvSQjyJ7PVVKyPb6k6FPf4ajRb0c6qUPTUV20nT5j9tyxHvHSiSU1uhRON4dZCK9VlfMtwumDQCOw==",
+      "type": "package",
+      "path": "imgur.api/5.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE",
+        "icon.png",
+        "imgur.api.5.0.0.nupkg.sha512",
+        "imgur.api.nuspec",
+        "lib/netstandard2.0/Imgur.API.dll",
+        "lib/netstandard2.0/Imgur.API.xml"
       ]
     },
     "Microsoft.AspNetCore.Authentication.JwtBearer/8.0.8": {
@@ -7181,6 +7212,7 @@
   "projectFileDependencyGroups": {
     "net8.0": [
       "CloudinaryDotNet >= 1.26.2",
+      "Imgur.API >= 5.0.0",
       "Microsoft.AspNetCore.Authentication.JwtBearer >= 8.0.8",
       "Microsoft.EntityFrameworkCore >= 8.0.8",
       "Microsoft.EntityFrameworkCore.Design >= 8.0.8",
@@ -7243,6 +7275,10 @@
           "CloudinaryDotNet": {
             "target": "Package",
             "version": "[1.26.2, )"
+          },
+          "Imgur.API": {
+            "target": "Package",
+            "version": "[5.0.0, )"
           },
           "Microsoft.AspNetCore.Authentication.JwtBearer": {
             "target": "Package",

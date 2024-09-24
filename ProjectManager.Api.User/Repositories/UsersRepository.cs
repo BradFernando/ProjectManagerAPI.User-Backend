@@ -12,15 +12,15 @@ namespace ProjectManager.Api.User.Repositories
     {
         //Llamamos al contexto de la base de datos y a ImgBBservice
         private readonly UserDbContext _context;
-        private readonly ImgbbService _imgbbService;
+        private readonly ImgurService _imgurService;
 
 
 
         //Inyectamos el contexto de la base de datos y ImgBBservice
-        public UsersRepository(UserDbContext context, ImgbbService imgbbService)
+        public UsersRepository(UserDbContext context, ImgurService imgurService)
         {
             _context = context;
-            _imgbbService = imgbbService;
+            _imgurService = imgurService;
 
         }
 
@@ -308,7 +308,8 @@ namespace ProjectManager.Api.User.Repositories
         }
         
         // Método para cargar una imagen a Imgbb
-        public async Task<string> UploadImageToImgbb(IFormFile file)
+// Método para subir una imagen a Imgur
+        public async Task<string> UploadImageToImgur(IFormFile file)
         {
             try
             {
@@ -317,12 +318,12 @@ namespace ProjectManager.Api.User.Repositories
                     throw new ArgumentException("No file provided");
                 }
 
-                var imageUrl = await _imgbbService.UploadImageAsync(file);
+                var imageUrl = await _imgurService.UploadImageAsync(file);
                 return imageUrl;
             }
             catch (Exception ex)
             {
-                throw new Exception("Error al cargar la imagen a Imgbb", ex);
+                throw new Exception("Error al cargar la imagen a Imgur", ex);
             }
         }
         

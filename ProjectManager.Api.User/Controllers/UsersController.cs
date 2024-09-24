@@ -215,7 +215,7 @@ namespace ProjectManager.Api.User.Controllers
         {
             try
             {
-                var imageUrl = await _usersRepository.UploadImageToImgbb(file); // Cambiado a Imgbb
+                var imageUrl = await _usersRepository.UploadImageToImgur(file); // Cambiado a Imgur
                 return Ok(new { ImageUrl = imageUrl });
             }
             catch (Exception ex)
@@ -223,6 +223,7 @@ namespace ProjectManager.Api.User.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Error al cargar la imagen: {ex.Message}");
             }
         }
+
 
     
         

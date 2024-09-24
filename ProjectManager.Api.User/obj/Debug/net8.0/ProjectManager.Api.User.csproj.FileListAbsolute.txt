@@ -138,3 +138,4 @@ C:\Users\UsuarioPC\Documents\RiderProjects\ProjectManager.Api.User\ProjectManage
 C:\Users\UsuarioPC\Documents\RiderProjects\ProjectManager.Api.User\ProjectManager.Api.User\bin\Debug\net8.0\Newtonsoft.Json.dll
 C:\Users\UsuarioPC\Documents\RiderProjects\ProjectManager.Api.User\ProjectManager.Api.User\obj\Debug\net8.0\ProjectManager.Api.User.sourcelink.json
 C:\Users\UsuarioPC\Documents\RiderProjects\ProjectManager.Api.User\ProjectManager.Api.User\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\UsuarioPC\Documents\RiderProjects\ProjectManager.Api.User\ProjectManager.Api.User\bin\Debug\net8.0\Imgur.API.dll
